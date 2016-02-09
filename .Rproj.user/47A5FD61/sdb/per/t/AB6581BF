@@ -1,0 +1,17 @@
+{
+    "contents" : "rm(list=ls(all=TRUE));\nlibrary(RCurl);\nlibrary(XML);\nlibrary(rjson);\n\nhost <- \"https://www.ptt.cc\";\n\nParser <- function(url)\n{\n  urlx <- paste0(host,url);\n  web <- htmlParse(getURL(urlx));\n  webHref <- xpathSApply(web,\"//div[@id='prodlist']/dl/dd/p/a\", xmlGetAttr,\"href\");\n  return (webHref);\n}\n\n\nweb <- NULL;\nIndexH <- Parser(\"/bbs/index.html\");\nX <- Parser(IndexH);\nweb <- X[-grep(\"[0-9]+.html\",X)];\nX <- X[grep(\"[0-9]+.html\",X)];\nX <- X[-grep(\"4881\",X)];\nfor( i in 1:length(X))\n{\n  x <- X[i];\n  while(length(x) > 0)\n  {\n    t <- Parser(x);\n    if(any(grepl(\"bbs/1.html\",t)==T))\n      t <- t[-grep(\"bbs/1.html\",t)];\n    num <- grep(\"[0-9]+.html\",t);\n    if( length(num) <= 0 )\n    {\n      web <- c(web,t);\n      t <- NULL;\n      x <- NULL;\n      break;\n    } else {\n      web <- c(web,t[-num]);\n      x <- t[num];\n    }  \n  }\n}\nwrite(web,\"PTTweb.txt\");\n\n",
+    "created" : 1454282353776.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4264009508",
+    "id" : "AB6581BF",
+    "lastKnownWriteTime" : 1454464275,
+    "path" : "D:/alice/Desktop/R/PTT/ClassPtt.R",
+    "project_path" : "ClassPtt.R",
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

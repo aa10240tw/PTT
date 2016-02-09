@@ -1,0 +1,18 @@
+{
+    "contents" : "rm(list=ls(all=TRUE));\nlibrary(RCurl);\nlibrary(XML);\nlibrary(Rcpp);\ndir.create(\".\\\\data\");\nhost <- \"https://www.ptt.cc\";\nallWeb <- readLines(con=\"Pttweb.txt\");\n\nfor( i in 1:length(allWeb))\n{\n  web <- allWeb[i];\n  \n  board <- htmlParse(getURL(paste0(host,web)));\n  board <- xpathSApply(board,\"//a[@class='btn wide']\",xmlGetAttr,\"href\")[2];\n  NewestPage <- gregexpr(\"[0-9]+.html\",board)[[1]];\n  NewestPage <- substr(board,NewestPage,NewestPage+attr(NewestPage,\"match.length\")-6);\n  NewestPage <- as.integer(NewestPage)+1;\n  \n  web <- sub(\".html\",\"\",web);\n  webPage <- NULL;\n  for( j in 1:NewestPage)\n  {\n    tmpPage <- paste0(host,web,j,\".html\");\n    webPage <- c(webPage,tmpPage);\n  }\n  \n  webName <- gregexpr(\"/bbs/[^/]+\",web);\n  webName <- substr(web,webName[[1]][1]+5,webName[[1]][1]+attr(webName[[1]],\"match.length\")-1);\n  tmpwebPage <- NULL;\n  tmp <- NULL;\n  \n  n <- as.integer(NewestPage/50);\n  file <- paste0(\".\\\\data\\\\\",webName,\".txt\");\n  file <- file(file,open='w');\n  des <- \"//div[@class='title']/a\";\n  for( j in 0:n)\n  {\n    tmpwebPage <- htmlParse(getURL(webPage[(j*50+1):(j*50+50)]));\n    tmpwebPage <- xpathSApply(tmpwebPage,des,xmlGetAttr,\"href\");\n    tmp <- write(x=tmpwebPage,append = T,file);\n  }\n  if(NewestPage %% 50 !=0 && n > 0)\n  {\n    tmpwebPage <- htmlParse(getURL(webPage[((n+1)*50+1):NewestPage]));\n    tmpwebPage <- xpathSApply(tmpwebPage,\"//div[@class='title']/a\",xmlGetAttr,\"href\");\n    tmp <- write(x=tmpwebPage,append = T,file = paste0(\".\\\\data\\\\\",webName,\".txt\"));\n  }\n  close(file);\n}\n",
+    "created" : 1454260604525.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1188526336",
+    "id" : "358E09A5",
+    "lastKnownWriteTime" : 1454467761,
+    "path" : "D:/alice/Desktop/R/PTT/Ptt.R",
+    "project_path" : "Ptt.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "type" : "r_source"
+}
